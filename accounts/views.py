@@ -30,10 +30,17 @@ def register(request):
 def login_view(request):
     if request.user.is_authenticated:
         return redirect(dashboard_for(request.user))
-    form = AuthenticationForm(request, data=request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        login(request, form.get_user())
-        return redirect(request.POST.get("next") or dashboard_for(request.user))
+    if request.method == "POST":
+        post_data = request.POST.copy()
+        if "username" in post_data:
+            post_data["username"] = post_data["username"].strip().lower()
+        form = AuthenticationForm(request, data=post_data)
+        if form.is_valid():
+            login(request, form.get_user())
+            messages.success(request, f"Welcome back, {form.get_user().full_name}!")
+            return redirect(request.POST.get("next") or dashboard_for(request.user))
+    else:
+        form = AuthenticationForm(request)
     next_url = request.GET.get("next") or request.POST.get("next")
     return render(request, "accounts/login.html", {"form": form, "next": next_url})
 

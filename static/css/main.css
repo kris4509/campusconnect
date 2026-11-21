@@ -72,8 +72,26 @@ h1, h2, h3, h4 { line-height: 1.2; font-weight: 700; }
   min-height: 68px;
 }
 .brand {
-  display: flex; align-items: center; gap: 10px;
-  font-weight: 700; font-size: 18px; color: var(--primary);
+  display: flex; align-items: center; gap: 12px;
+  font-weight: 800; font-size: 20px; color: var(--primary);
+  letter-spacing: -0.5px; text-decoration: none;
+}
+.brand-logo-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #f97316 100%);
+  display: grid; place-items: center; color: #fff;
+  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.28);
+  transition: transform 250ms cubic-bezier(.4, 0, .2, 1);
+}
+.brand:hover .brand-logo-icon {
+  transform: rotate(-6deg) scale(1.06);
+}
+.brand-text { font-weight: 800; font-size: 20px; }
+.brand-gradient {
+  background: linear-gradient(135deg, #f97316 0%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
 }
 .brand-icon {
   width: 36px; height: 36px; display: grid; place-items: center;
@@ -247,10 +265,19 @@ h1, h2, h3, h4 { line-height: 1.2; font-weight: 700; }
 .event-card:hover .card-image img { transform: scale(1.05); }
 .card-badge {
   position: absolute; top: 12px; left: 12px;
-  padding: 4px 10px; border-radius: var(--radius-full);
-  background: rgba(15,23,42,.75); backdrop-filter: blur(4px);
+  padding: 5px 12px; border-radius: var(--radius-full);
+  background: rgba(15,23,42,.85); backdrop-filter: blur(8px);
   color: #fff; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2);
 }
+.card-badge[data-cat="workshops"] { background: rgba(217, 119, 6, 0.92); }
+.card-badge[data-cat="technology-events"] { background: rgba(13, 148, 136, 0.92); }
+.card-badge[data-cat="sports"] { background: rgba(5, 150, 105, 0.92); }
+.card-badge[data-cat="competitions"] { background: rgba(124, 58, 237, 0.92); }
+.card-badge[data-cat="entertainment"] { background: rgba(225, 29, 72, 0.92); }
+.card-badge[data-cat="academic-seminars"] { background: rgba(37, 99, 235, 0.92); }
+.card-badge[data-cat="career-events"] { background: rgba(51, 65, 85, 0.92); }
+.card-badge[data-cat="student-association-events"] { background: rgba(192, 38, 211, 0.92); }
 .card-date-badge {
   position: absolute; top: 12px; right: 12px;
   background: var(--surface); border-radius: var(--radius);

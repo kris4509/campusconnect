@@ -7,6 +7,11 @@ User = get_user_model()
 
 
 class RegistrationForm(forms.ModelForm):
+    student_number = forms.CharField(
+        required=False,
+        help_text="Optional for students: Your university admission or registration number",
+        widget=forms.TextInput(attrs={"placeholder": "e.g. S13/04821/22 (Optional)"}),
+    )
     password = forms.CharField(
         min_length=8,
         help_text="Use at least 8 characters, including a mix of letters and numbers.",
@@ -20,14 +25,17 @@ class RegistrationForm(forms.ModelForm):
         fields = ("full_name", "email", "student_number", "phone_number", "role")
 
     def clean_email(self):
-        email = self.cleaned_data["email"].lower()
+        email = self.cleaned_data["email"].strip().lower()
         if User.objects.filter(email__iexact=email).exists():
             raise forms.ValidationError("An account with this university email already exists.")
         return email
 
     def clean_student_number(self):
         number = self.cleaned_data.get("student_number")
-        if number and User.objects.filter(student_number__iexact=number).exists():
+        if not number or not number.strip():
+            return None
+        number = number.strip()
+        if User.objects.filter(student_number__iexact=number).exists():
             raise forms.ValidationError("This registration/student number is already in use.")
         return number
 
