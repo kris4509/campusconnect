@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Payment History — CampusConnect{% endblock %}
+
+{% block content %}
+<div class="container section">
+  <div class="dash-header">
+    <div>
+      <span class="eyebrow">Financial Records</span>
+      <h1>Payment History</h1>
+      <p class="meta">View all your M-Pesa and simulated payment transactions.</p>
+    </div>
+    <a class="btn btn-secondary btn-sm" href="{% url 'bookings:tickets' %}">
+      <span class="material-symbols-outlined">confirmation_number</span> My Tickets
+    </a>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Event Title</th>
+          <th>Booking Ref</th>
+          <th>Amount</th>
+          <th>Provider</th>
+          <th>Status</th>
+          <th>M-Pesa Receipt</th>
+          <th>Transaction Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for payment in payments %}
+          <tr>
+            <td>
+              <a href="{% url 'events:detail' payment.booking.event.pk %}" style="font-weight:600;color:var(--primary)">
+                {{ payment.booking.event.title }}
+              </a>
+            </td>
+            <td><code>{{ payment.booking.reference }}</code></td>
+            <td><strong>KES {{ payment.amount|floatformat:2 }}</strong></td>
+            <td>
+              <span class="badge" style="background:#e8f5e9;color:#2e7d32">
+                {{ payment.get_provider_display }}
+              </span>
+            </td>
+            <td>
+              <span class="badge badge-{{ payment.status }}">
+                {{ payment.get_status_display }}
+              </span>
+            </td>
+            <td>
+              {% if payment.mpesa_receipt %}
+                <strong style="font-family:monospace;letter-spacing:.5px">{{ payment.mpesa_receipt }}</strong>
+              {% else %}
+                <span class="meta">—</span>
+              {% endif %}
+            </td>
+            <td class="meta">{{ payment.created_at|date:"d M Y, H:i" }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="7" class="text-center" style="padding:40px">
+              <span class="material-symbols-outlined" style="font-size:36px;color:var(--text-3);display:block;margin-bottom:8px">payments</span>
+              No payment transactions recorded yet.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

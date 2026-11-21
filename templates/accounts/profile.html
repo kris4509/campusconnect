@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Profile Settings — CampusConnect{% endblock %}
+
+{% block content %}
+<div class="container section">
+  <div class="form-container">
+    <div class="form-card">
+      <div class="form-header">
+        <span class="eyebrow">Account Settings</span>
+        <h1>Your Profile</h1>
+        <p class="meta">Update your contact details, phone number (used for M-Pesa prompts), and student ID.</p>
+      </div>
+
+      <form method="post" class="form-grid">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="notice notice-error">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        {% for field in form %}
+          <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+              <span class="form-help">{{ field.help_text }}</span>
+            {% endif %}
+            {{ field.errors }}
+          </div>
+        {% endfor %}
+
+        <div style="display:flex;gap:12px;margin-top:16px">
+          <button class="btn btn-primary btn-lg" type="submit">
+            <span class="material-symbols-outlined">save</span> Save Changes
+          </button>
+          <a class="btn btn-secondary btn-lg" href="{% url 'dashboard:student' %}">Back to Dashboard</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ action }} — CampusConnect{% endblock %}
+
+{% block content %}
+<div class="container section">
+  <div class="form-container">
+    <div class="form-card">
+      <div class="form-header">
+        <span class="eyebrow">Organizer Portal</span>
+        <h1>{{ action }}</h1>
+        <p class="meta">Fill in the event details below to submit for administrative review.</p>
+      </div>
+
+      <form method="post" enctype="multipart/form-data" class="form-grid">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="notice notice-error">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        {% for field in form %}
+          <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+              <span class="form-help">{{ field.help_text }}</span>
+            {% endif %}
+            {{ field.errors }}
+          </div>
+        {% endfor %}
+
+        <div style="display:flex;gap:12px;margin-top:16px">
+          <button class="btn btn-primary btn-lg" type="submit" style="flex:1">
+            <span class="material-symbols-outlined">publish</span> Submit Event
+          </button>
+          <a class="btn btn-secondary btn-lg" href="{% url 'dashboard:organizer' %}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

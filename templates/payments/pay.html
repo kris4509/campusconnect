@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Complete Payment — {{ booking.event.title }}{% endblock %}
+
+{% block content %}
+<div class="container section">
+  <div class="payment-layout">
+    <!-- Visual Step Tracker -->
+    <div class="payment-steps">
+      <div class="step-item complete">
+        <span class="step-dot"><span class="material-symbols-outlined" style="font-size:16px">check</span></span>
+        <span class="step-label">Select</span>
+      </div>
+      <div class="step-line complete"></div>
+      <div class="step-item active">
+        <span class="step-dot">2</span>
+        <span class="step-label">M-Pesa Payment</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item">
+        <span class="step-dot">3</span>
+        <span class="step-label">Digital Ticket</span>
+      </div>
+    </div>
+
+    <div class="payment-card">
+      <div class="payment-header">
+        <span class="eyebrow" style="color:#6ee7b7">Secure Checkout</span>
+        <h2>M-Pesa STK Push</h2>
+      </div>
+
+      <div class="payment-body">
+        <!-- Order Summary -->
+        <div class="payment-summary">
+          <div class="payment-summary-thumb">
+            <img src="{{ booking.event.poster_url }}" alt="{{ booking.event.title }}">
+          </div>
+          <div class="payment-summary-info">
+            <h3>{{ booking.event.title }}</h3>
+            <div class="meta">{{ booking.event.venue }}</div>
+            <div class="meta">{{ booking.event.event_date|date:"D, d M Y" }} · {{ booking.event.start_time|time:"H:i" }}</div>
+            <div class="meta" style="margin-top:4px">Ref: <code>{{ booking.reference }}</code></div>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:baseline">
+          <span style="font-size:14px;color:var(--text-2);font-weight:600">Total Payable Amount</span>
+          <div class="payment-amount" style="margin:0">
+            <small>KES</small> {{ booking.event.ticket_price|floatformat:2 }}
+          </div>
+        </div>
+
+        <hr class="divider" style="margin:20px 0">
+
+        <!-- M-Pesa Info Banner -->
+        <div class="mpesa-brand">
+          <span class="material-symbols-outlined">phonelink_ring</span>
+          <div>
+            <strong>Lipa na M-Pesa Online (STK Push)</strong>
+            <div style="font-size:12px;font-weight:normal;color:#388e3c">An instant prompt will appear on your phone asking for your M-Pesa PIN.</div>
+          </div>
+        </div>
+
+        <form method="post" class="form-grid">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="phone">M-Pesa Phone Number</label>
+            <div style="position:relative">
+              <input id="phone" class="form-input" name="phone_number" value="{{ user.phone_number }}"
+                     placeholder="2547XXXXXXXX or 07XXXXXXXX" required style="font-size:16px;letter-spacing:.5px;font-weight:600">
+            </div>
+            <span class="form-help">Enter your Safaricom phone number registered for M-Pesa.</span>
+          </div>
+
+          {% if daraja_configured %}
+            <button class="btn btn-primary btn-block btn-lg" type="submit" style="background:#059669;border-color:#059669;margin-top:8px">
+              <span class="material-symbols-outlined">send_to_mobile</span> Send M-Pesa Prompt
+            </button>
+            <div style="text-align:center;margin-top:10px">
+              <button class="btn btn-ghost btn-sm" name="simulate" value="1" type="submit" style="font-size:12px;color:var(--text-3)">
+                ⚡ Or simulate instant payment without phone
+              </button>
+            </div>
+          {% else %}
+            <div style="background:var(--warning-soft);border:1px solid #fde68a;border-radius:var(--radius);padding:12px;margin:8px 0;font-size:13px;color:#92400e">
+              <strong>Local Development Mode:</strong> Live Safaricom Daraja credentials are not set in <code>.env</code>. You can simulate a successful transaction to verify ticket issuance.
+            </div>
+            <button class="btn btn-primary btn-block btn-lg" name="simulate" value="1" type="submit" style="background:#059669;border-color:#059669">
+              <span class="material-symbols-outlined">check_circle</span> Simulate Instant Payment
+            </button>
+          {% endif %}
+        </form>
+
+        <div style="text-align:center;margin-top:20px">
+          <a class="btn btn-ghost btn-sm" href="{% url 'bookings:list' %}">
+            <span class="material-symbols-outlined">arrow_back</span> Return to My Bookings
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

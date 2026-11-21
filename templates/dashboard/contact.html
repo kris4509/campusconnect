@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Contact & Support — CampusConnect{% endblock %}
+
+{% block content %}
+<div class="container section">
+  <div class="content-page text-center" style="max-width:800px">
+    <span class="eyebrow">Support & Inquiries</span>
+    <h1>We're Here to Help</h1>
+    <p>Have questions about event booking, M-Pesa transactions, or hosting an event on CampusConnect? Reach out to our campus support team.</p>
+
+    <div class="contact-grid">
+      <div class="contact-card">
+        <span class="material-symbols-outlined">support_agent</span>
+        <h3>Ticketing Support</h3>
+        <p>support@campusconnect.ac.ke</p>
+        <div class="meta" style="margin-top:6px">Mon – Fri, 8am – 5pm</div>
+      </div>
+
+      <div class="contact-card">
+        <span class="material-symbols-outlined">payments</span>
+        <h3>Payment Inquiries</h3>
+        <p>payments@campusconnect.ac.ke</p>
+        <div class="meta" style="margin-top:6px">M-Pesa STK & refunds</div>
+      </div>
+
+      <div class="contact-card">
+        <span class="material-symbols-outlined">apartment</span>
+        <h3>Student Affairs Office</h3>
+        <p>Main Campus, Administration Block</p>
+        <div class="meta" style="margin-top:6px">Room 204, 2nd Floor</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

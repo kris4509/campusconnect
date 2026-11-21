@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Create Account — CampusConnect{% endblock %}
+
+{% block content %}
+<div class="auth-layout">
+  <div class="auth-card" style="max-width:520px">
+    <span class="eyebrow">Get Started</span>
+    <h1>Create Your Account</h1>
+
+    {% if form.non_field_errors %}
+      <div class="notice notice-error" style="margin-bottom:16px">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    <form method="post" class="form-grid">
+      {% csrf_token %}
+
+      {% for field in form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+            <span class="form-help">{{ field.help_text }}</span>
+          {% endif %}
+          {{ field.errors }}
+        </div>
+      {% endfor %}
+
+      <button class="btn btn-primary btn-block btn-lg" type="submit" style="margin-top:12px">
+        <span class="material-symbols-outlined">person_add</span> Register Account
+      </button>
+    </form>
+
+    <div class="auth-divider">or</div>
+
+    <div class="auth-footer">
+      Already registered? <a href="{% url 'accounts:login' %}">Sign in here</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Payment Management — CampusConnect{% endblock %}
+
+{% block content %}
+<div class="container section">
+  <div class="dash-header">
+    <div>
+      <span class="eyebrow">Administration</span>
+      <h1>Payment Transactions</h1>
+      <p class="meta">Real-time record of all M-Pesa STK Push and simulated payments across the campus.</p>
+    </div>
+    <a class="btn btn-secondary btn-sm" href="{% url 'dashboard:admin' %}">Back to Admin</a>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Booking Ref</th>
+          <th>Student</th>
+          <th>Event</th>
+          <th>Amount</th>
+          <th>Gateway</th>
+          <th>Status</th>
+          <th>Receipt Number</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for payment in payments %}
+          <tr>
+            <td><code>{{ payment.booking.reference }}</code></td>
+            <td>
+              <strong>{{ payment.booking.student.full_name }}</strong>
+              <div class="meta">{{ payment.phone_number }}</div>
+            </td>
+            <td>{{ payment.booking.event.title }}</td>
+            <td><strong>KES {{ payment.amount|floatformat:2 }}</strong></td>
+            <td>
+              <span class="badge" style="background:#e8f5e9;color:#2e7d32">
+                {{ payment.get_provider_display }}
+              </span>
+            </td>
+            <td>
+              <span class="badge badge-{{ payment.status }}">{{ payment.get_status_display }}</span>
+            </td>
+            <td>
+              {% if payment.mpesa_receipt %}
+                <code>{{ payment.mpesa_receipt }}</code>
+              {% else %}
+                <span class="meta">—</span>
+              {% endif %}
+            </td>
+            <td class="meta">{{ payment.created_at|date:"d M Y, H:i" }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="8" class="text-center" style="padding:40px">
+              No payments have been recorded yet.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

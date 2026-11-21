@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}User Management — CampusConnect{% endblock %}
+
+{% block content %}
+<div class="container section">
+  <div class="dash-header">
+    <div>
+      <span class="eyebrow">Administration</span>
+      <h1>User Management</h1>
+      <p class="meta">All registered students, organizers, and campus administrators.</p>
+    </div>
+    <a class="btn btn-secondary btn-sm" href="{% url 'dashboard:admin' %}">Back to Admin</a>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Full Name</th>
+          <th>Email Address</th>
+          <th>Phone Number</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Joined</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for account in users %}
+          <tr>
+            <td><strong>{{ account.full_name }}</strong></td>
+            <td>{{ account.email }}</td>
+            <td class="meta">{{ account.phone_number }}</td>
+            <td>
+              <span class="badge {% if account.role == 'organizer' %}badge-purple{% elif account.role == 'admin' %}badge-teal{% else %}badge-warning{% endif %}">
+                {{ account.get_role_display }}
+              </span>
+            </td>
+            <td>
+              {% if account.is_active %}
+                <span class="badge badge-success">Active</span>
+              {% else %}
+                <span class="badge badge-danger">Inactive</span>
+              {% endif %}
+            </td>
+            <td class="meta">{{ account.created_at|date:"d M Y" }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="text-center" style="padding:36px">No user accounts found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

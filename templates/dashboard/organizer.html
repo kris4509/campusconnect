@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Organizer Dashboard — CampusConnect{% endblock %}
+
+{% block content %}
+<div class="container section">
+  <div class="dash-header">
+    <div>
+      <span class="eyebrow">Organizer Portal</span>
+      <h1>Event Management</h1>
+      <p class="meta">Create, edit, and track attendee registration for your events.</p>
+    </div>
+    <a class="btn btn-primary btn-sm" href="{% url 'events:create' %}">
+      <span class="material-symbols-outlined">add_circle</span> Host New Event
+    </a>
+  </div>
+
+  <!-- Metric Overview -->
+  <div class="stat-grid">
+    <div class="stat-card accent">
+      <span class="stat-label">Total Events</span>
+      <span class="stat-value">{{ events|length }}</span>
+    </div>
+    <div class="stat-card teal">
+      <span class="stat-label">Published</span>
+      <span class="stat-value">
+        {% with pub=0 %}
+          {{ events|length }}
+        {% endwith %}
+      </span>
+    </div>
+    <div class="stat-card purple">
+      <span class="stat-label">Portal</span>
+      <span class="stat-value" style="font-size:22px">Organizer</span>
+    </div>
+    <div class="stat-card success">
+      <span class="stat-label">Action</span>
+      <span class="stat-value" style="font-size:18px">
+        <a href="{% url 'events:create' %}" style="color:var(--success)">+ New Event</a>
+      </span>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <div>
+      <span class="section-eyebrow">Inventory</span>
+      <h2>Your Organized Events</h2>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Event Name</th>
+          <th>Date</th>
+          <th>Venue</th>
+          <th>Price</th>
+          <th>Status</th>
+          <th>Bookings</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for event in events %}
+          <tr>
+            <td>
+              <a href="{% url 'events:detail' event.pk %}" style="font-weight:700;color:var(--primary)">
+                {{ event.title }}
+              </a>
+            </td>
+            <td>{{ event.event_date|date:"d M Y" }}</td>
+            <td class="meta">{{ event.venue|truncatechars:20 }}</td>
+            <td>
+              {% if event.is_paid %}KES {{ event.ticket_price|floatformat:0 }}{% else %}<span style="color:var(--success)">FREE</span>{% endif %}
+            </td>
+            <td>
+              <span class="badge badge-{{ event.publication_status }}">
+                {{ event.get_publication_status_display }}
+              </span>
+            </td>
+            <td>
+              <strong>{{ event.bookings.count }}</strong> / {{ event.maximum_tickets }}
+            </td>
+            <td>
+              <div style="display:flex;gap:6px">
+                <a class="btn btn-secondary btn-sm" href="{% url 'events:edit' event.pk %}" style="padding:4px 8px;font-size:12px">
+                  <span class="material-symbols-outlined" style="font-size:14px">edit</span> Edit
+                </a>
+                <a class="btn btn-secondary btn-sm" href="{% url 'events:attendees' event.pk %}" style="padding:4px 8px;font-size:12px">
+                  <span class="material-symbols-outlined" style="font-size:14px">group</span> Attendees
+                </a>
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="7" class="text-center" style="padding:40px">
+              <span class="material-symbols-outlined" style="font-size:36px;color:var(--text-3);display:block;margin-bottom:8px">campaign</span>
+              You have not created any events yet.
+              <div style="margin-top:12px">
+                <a class="btn btn-primary btn-sm" href="{% url 'events:create' %}">Create Your First Event</a>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

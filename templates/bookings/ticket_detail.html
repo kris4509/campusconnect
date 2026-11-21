@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Digital Ticket — {{ ticket.reference }} — CampusConnect{% endblock %}
+
+{% block content %}
+<div class="container section">
+  <div class="ticket-container">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px" class="ticket-actions">
+      <a class="btn btn-secondary btn-sm" href="{% url 'bookings:tickets' %}">
+        <span class="material-symbols-outlined">arrow_back</span> All Tickets
+      </a>
+      <button class="btn btn-primary btn-sm" onclick="window.print()">
+        <span class="material-symbols-outlined">print</span> Print / Save Pass
+      </button>
+    </div>
+
+    <!-- Official Authentic Event Ticket Card -->
+    <div class="ticket-card">
+      <div class="ticket-header">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="eyebrow">Official Admission Pass</span>
+          <span class="badge badge-{{ ticket.status }}" style="color:#fff;background:rgba(255,255,255,.2)">
+            {{ ticket.get_status_display|upper }}
+          </span>
+        </div>
+        <h1>{{ ticket.booking.event.title }}</h1>
+        <div style="font-size:14px;color:#94a3b8;margin-top:4px">
+          {{ ticket.booking.event.category.name }} · {{ ticket.booking.event.venue }}
+        </div>
+      </div>
+
+      <div class="ticket-body">
+        <div>
+          <div class="ticket-info-group">
+            <label>Attendee Name</label>
+            <span>{{ user.full_name }}</span>
+          </div>
+
+          {% if user.student_number %}
+            <div class="ticket-info-group">
+              <label>Student ID / Reg No</label>
+              <span>{{ user.student_number }}</span>
+            </div>
+          {% endif %}
+
+          <div class="ticket-info-group">
+            <label>Date & Time</label>
+            <span>{{ ticket.booking.event.event_date|date:"l, d F Y" }} at {{ ticket.booking.event.start_time|time:"H:i" }}</span>
+          </div>
+
+          <div class="ticket-info-group">
+            <label>Venue / Location</label>
+            <span>{{ ticket.booking.event.venue }}</span>
+          </div>
+
+          <div class="ticket-info-group">
+            <label>Organizer</label>
+            <span>{{ ticket.booking.event.organizer.full_name }}</span>
+          </div>
+
+          <div class="ticket-info-group" style="margin-bottom:0">
+            <label>Admission Type</label>
+            <span>{% if ticket.booking.event.is_paid %}Paid Pass (KES {{ ticket.booking.event.ticket_price|floatformat:0 }}){% else %}General Free Admission{% endif %}</span>
+          </div>
+        </div>
+
+        <!-- High-contrast Scannable QR code for Identification -->
+        <div class="ticket-qr">
+          {% if qr_code %}
+            <img src="data:image/png;base64,{{ qr_code }}" alt="Ticket QR code">
+          {% else %}
+            <!-- Fallback reliable dynamic QR renderer -->
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=CAMPUSCONNECT:{{ ticket.reference }}:EVENT:{{ ticket.booking.event.pk }}" alt="Ticket QR Code">
+          {% endif %}
+          <div class="meta" style="font-weight:600;color:var(--text-2);margin-top:4px">Scan for Arrival Check-In</div>
+          <div class="meta" style="font-size:11px">Identification verified</div>
+        </div>
+      </div>
+
+      <!-- Ticket Tear Notch Line -->
+      <hr class="ticket-tear">
+
+      <div class="ticket-footer">
+        <div class="ticket-ref">
+          <span>Ticket Ref:</span> <strong>{{ ticket.reference }}</strong>
+          <span style="margin:0 8px;color:var(--border)">|</span>
+          <span>Booking:</span> <strong>{{ ticket.booking.reference }}</strong>
+        </div>
+        <div class="ticket-ref meta">
+          Issued on {{ ticket.created_at|date:"d M Y" }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Instruction notice -->
+    <div style="margin-top:20px;text-align:center;color:var(--text-2);font-size:13px">
+      <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;color:var(--accent)">info</span>
+      Please have this screen ready or bring a printed copy to present to the event coordinator at the entrance.
+    </div>
+  </div>
+</div>
+{% endblock %}

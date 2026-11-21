@@ -1,0 +1,117 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}CampusConnect{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="{% url 'dashboard:home' %}">
+        <span class="brand-icon">CC</span>
+        <span>CampusConnect</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Toggle navigation" onclick="document.querySelector('.nav-menu').classList.toggle('open')">
+        <span class="material-symbols-outlined" style="font-size:20px">menu</span> Menu
+      </button>
+      <nav class="nav-menu" aria-label="Primary navigation">
+        <a class="nav-link" href="{% url 'events:list' %}">
+          <span class="material-symbols-outlined" style="font-size:18px;vertical-align:-3px">explore</span> Explore
+        </a>
+        <a class="nav-link" href="{% url 'dashboard:about' %}">About</a>
+        <a class="nav-link" href="{% url 'dashboard:contact' %}">Contact</a>
+        {% if user.is_authenticated %}
+          {% if user.role == "organizer" %}
+            <a class="nav-link" href="{% url 'dashboard:organizer' %}">Dashboard</a>
+          {% elif user.role == "admin" or user.is_superuser %}
+            <a class="nav-link" href="{% url 'dashboard:admin' %}">Admin</a>
+          {% else %}
+            <a class="nav-link" href="{% url 'dashboard:student' %}">My Dashboard</a>
+          {% endif %}
+        {% endif %}
+        <div class="nav-actions">
+          {% if user.is_authenticated %}
+            <a class="btn btn-ghost btn-sm" href="{% url 'accounts:profile' %}">
+              <span class="material-symbols-outlined" style="font-size:18px">person</span> {{ user.full_name|truncatewords:2 }}
+            </a>
+            <form method="post" action="{% url 'accounts:logout' %}" style="display:inline">
+              {% csrf_token %}
+              <button class="btn btn-secondary btn-sm" type="submit">Sign out</button>
+            </form>
+          {% else %}
+            <a class="btn btn-secondary btn-sm" href="{% url 'accounts:login' %}">Sign in</a>
+            <a class="btn btn-primary btn-sm" href="{% url 'accounts:register' %}">Create account</a>
+          {% endif %}
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  {% if messages %}
+    <div class="notice-bar">
+      {% for message in messages %}
+        <div class="notice notice-{{ message.tags }}">
+          <span class="material-symbols-outlined" style="font-size:18px">
+            {% if 'success' in message.tags %}check_circle{% elif 'error' in message.tags %}error{% else %}info{% endif %}
+          </span>
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <main>{% block content %}{% endblock %}</main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <div class="brand">
+          <span class="brand-icon">CC</span>
+          <span>CampusConnect</span>
+        </div>
+        <p style="margin-top:12px">Your gateway to campus events, bookings, and digital tickets — all in one place.</p>
+      </div>
+      <div class="footer-section">
+        <h4>Platform</h4>
+        <a href="{% url 'events:list' %}">Explore Events</a>
+        <a href="{% url 'dashboard:about' %}">About Us</a>
+        <a href="{% url 'dashboard:contact' %}">Contact</a>
+      </div>
+      <div class="footer-section">
+        <h4>Students</h4>
+        {% if user.is_authenticated %}
+          <a href="{% url 'bookings:list' %}">My Bookings</a>
+          <a href="{% url 'bookings:tickets' %}">My Tickets</a>
+          <a href="{% url 'payments:history' %}">Payment History</a>
+        {% else %}
+          <a href="{% url 'accounts:register' %}">Create Account</a>
+          <a href="{% url 'accounts:login' %}">Sign In</a>
+        {% endif %}
+      </div>
+      <div class="footer-section">
+        <h4>Organizers</h4>
+        {% if user.is_authenticated and user.role == "organizer" %}
+          <a href="{% url 'events:create' %}">Create Event</a>
+          <a href="{% url 'dashboard:organizer' %}">Dashboard</a>
+        {% else %}
+          <a href="{% url 'accounts:register' %}">Become an Organizer</a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>&copy; {% now "Y" %} CampusConnect. All rights reserved.</span>
+      <span>Built for campus communities.</span>
+    </div>
+  </footer>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

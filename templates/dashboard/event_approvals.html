@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Event Approvals — CampusConnect{% endblock %}
+
+{% block content %}
+<div class="container section">
+  <div class="dash-header">
+    <div>
+      <span class="eyebrow">Administration</span>
+      <h1>Event Approvals</h1>
+      <p class="meta">Review pending event submissions from campus organizers before publication.</p>
+    </div>
+    <a class="btn btn-secondary btn-sm" href="{% url 'dashboard:admin' %}">Back to Admin</a>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Event Title</th>
+          <th>Organizer</th>
+          <th>Category</th>
+          <th>Event Date</th>
+          <th>Pricing</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for event in events %}
+          <tr>
+            <td>
+              <strong>{{ event.title }}</strong>
+              <div class="meta">{{ event.venue }}</div>
+            </td>
+            <td>{{ event.organizer.full_name }} ({{ event.organizer.email }})</td>
+            <td><span class="badge badge-purple">{{ event.category.name }}</span></td>
+            <td>{{ event.event_date|date:"D, d M Y" }}</td>
+            <td>{% if event.is_paid %}KES {{ event.ticket_price|floatformat:0 }}{% else %}Free{% endif %}</td>
+            <td>
+              <div style="display:flex;gap:6px">
+                <form method="post" action="{% url 'dashboard:event_approval_action' event.pk 'approve' %}" style="display:inline">
+                  {% csrf_token %}
+                  <button class="btn btn-primary btn-sm" type="submit" style="background:var(--success);border-color:var(--success);padding:4px 10px">
+                    <span class="material-symbols-outlined" style="font-size:16px">check</span> Approve
+                  </button>
+                </form>
+                <form method="post" action="{% url 'dashboard:event_approval_action' event.pk 'reject' %}" style="display:inline">
+                  {% csrf_token %}
+                  <button class="btn btn-danger btn-sm" type="submit" style="padding:4px 10px">
+                    <span class="material-symbols-outlined" style="font-size:16px">close</span> Reject
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="text-center" style="padding:40px">
+              <span class="material-symbols-outlined" style="font-size:36px;color:var(--text-3);display:block;margin-bottom:8px">task_alt</span>
+              All submissions reviewed! No events are currently waiting for approval.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

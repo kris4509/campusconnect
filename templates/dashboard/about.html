@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}About Us — CampusConnect{% endblock %}
+
+{% block content %}
+<div class="container section">
+  <div class="content-page">
+    <span class="eyebrow">About CampusConnect</span>
+    <h1>Empowering Campus Engagement</h1>
+    <p>CampusConnect is the premier event discovery, reservation, and automated ticketing hub designed specifically for university students, faculty organizers, and campus clubs.</p>
+    <p>Our platform eliminates traditional paper ticketing hassles by providing digital access passes, instant Lipa na M-Pesa STK push checkout, and scannable QR verification for quick arrival at venue gates.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <span class="material-symbols-outlined" style="font-size:32px;color:var(--accent);margin-bottom:8px">qr_code_scanner</span>
+        <h3>Smart QR Admission</h3>
+        <p>Every confirmed booking generates a unique encrypted QR ticket for effortless check-in at the door.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="material-symbols-outlined" style="font-size:32px;color:var(--success);margin-bottom:8px">payments</span>
+        <h3>Lipa na M-Pesa</h3>
+        <p>Instant phone prompts for ticket purchases with immediate receipt issuance and automated pass release.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="material-symbols-outlined" style="font-size:32px;color:var(--purple);margin-bottom:8px">campaign</span>
+        <h3>Organizer Suite</h3>
+        <p>Faculty and clubs can publish events, monitor capacity in real-time, and download complete attendee rosters.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="material-symbols-outlined" style="font-size:32px;color:var(--teal);margin-bottom:8px">verified</span>
+        <h3>Verified Safety</h3>
+        <p>Administrative review ensures all campus activities meet university standards and student safety regulations.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

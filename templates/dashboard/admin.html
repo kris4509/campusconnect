@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Administrator Dashboard — CampusConnect{% endblock %}
+
+{% block content %}
+<div class="container section">
+  <div class="dash-header">
+    <div>
+      <span class="eyebrow">System Control</span>
+      <h1>Administration Console</h1>
+      <p class="meta">Manage campus platform users, event publication approvals, and transactions.</p>
+    </div>
+    <a class="btn btn-secondary btn-sm" href="/admin/" target="_blank">
+      <span class="material-symbols-outlined">settings</span> Django Admin
+    </a>
+  </div>
+
+  <!-- Metrics Grid -->
+  <div class="stat-grid">
+    <div class="stat-card accent">
+      <span class="stat-label">Pending Review</span>
+      <span class="stat-value" style="color:var(--warning)">{{ pending_events }}</span>
+    </div>
+    <div class="stat-card teal">
+      <span class="stat-label">Live Events</span>
+      <span class="stat-value">{{ published_events }}</span>
+    </div>
+    <div class="stat-card purple">
+      <span class="stat-label">Total Users</span>
+      <span class="stat-value">{{ users }}</span>
+    </div>
+    <div class="stat-card success">
+      <span class="stat-label">Payments</span>
+      <span class="stat-value">{{ payments }}</span>
+    </div>
+  </div>
+
+  <!-- Management Navigation -->
+  <div class="section-header">
+    <div>
+      <span class="section-eyebrow">Administration Sections</span>
+      <h2>Operations</h2>
+    </div>
+  </div>
+
+  <div class="quick-actions">
+    <a class="action-card" href="{% url 'dashboard:event_approvals' %}">
+      <div class="action-icon orange">
+        <span class="material-symbols-outlined">rate_review</span>
+      </div>
+      <div>
+        <h3>Event Approvals</h3>
+        <p>{{ pending_events }} submissions pending</p>
+      </div>
+    </a>
+
+    <a class="action-card" href="{% url 'dashboard:users' %}">
+      <div class="action-icon purple">
+        <span class="material-symbols-outlined">manage_accounts</span>
+      </div>
+      <div>
+        <h3>User Management</h3>
+        <p>Students and Organizers</p>
+      </div>
+    </a>
+
+    <a class="action-card" href="{% url 'dashboard:bookings' %}">
+      <div class="action-icon teal">
+        <span class="material-symbols-outlined">receipt_long</span>
+      </div>
+      <div>
+        <h3>Booking Management</h3>
+        <p>All {{ bookings }} ticket reservations</p>
+      </div>
+    </a>
+
+    <a class="action-card" href="{% url 'dashboard:payments' %}">
+      <div class="action-icon green">
+        <span class="material-symbols-outlined">payments</span>
+      </div>
+      <div>
+        <h3>Payment Management</h3>
+        <p>M-Pesa STK push transactions</p>
+      </div>
+    </a>
+  </div>
+</div>
+{% endblock %}

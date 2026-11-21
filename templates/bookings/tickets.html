@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}My Digital Tickets — CampusConnect{% endblock %}
+
+{% block content %}
+<div class="container section">
+  <div class="dash-header">
+    <div>
+      <span class="eyebrow">Student Passholder</span>
+      <h1>My Digital Tickets</h1>
+      <p class="meta">Your official QR access passes for confirmed event entry.</p>
+    </div>
+    <a class="btn btn-secondary btn-sm" href="{% url 'bookings:list' %}">
+      View Bookings
+    </a>
+  </div>
+
+  {% if tickets %}
+    <div class="event-grid">
+      {% for ticket in tickets %}
+        <div class="event-card" style="border-top:4px solid var(--accent)">
+          <div class="card-image" style="height:150px">
+            <img src="{{ ticket.booking.event.poster_url }}" alt="{{ ticket.booking.event.title }}">
+            <span class="card-badge">{{ ticket.booking.event.category.name }}</span>
+            <div class="card-date-badge">
+              <strong>{{ ticket.booking.event.event_date|date:"d" }}</strong>
+              <span>{{ ticket.booking.event.event_date|date:"M" }}</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <span class="badge badge-{{ ticket.status }}">{{ ticket.get_status_display }} PASS</span>
+              <code style="font-size:12px;color:var(--text-3)">{{ ticket.reference }}</code>
+            </div>
+            <h3 class="card-title">{{ ticket.booking.event.title }}</h3>
+            <div class="card-meta">
+              <div class="card-meta-item">
+                <span class="material-symbols-outlined">schedule</span>
+                <span>{{ ticket.booking.event.start_time|time:"H:i" }} – {{ ticket.booking.event.end_time|time:"H:i" }}</span>
+              </div>
+              <div class="card-meta-item">
+                <span class="material-symbols-outlined">location_on</span>
+                <span>{{ ticket.booking.event.venue|truncatechars:26 }}</span>
+              </div>
+            </div>
+            <div class="card-footer" style="padding-top:16px">
+              <a class="btn btn-primary btn-block" href="{% url 'bookings:ticket_detail' ticket.pk %}">
+                <span class="material-symbols-outlined">qr_code_scanner</span> Open Digital Pass
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <span class="material-symbols-outlined">confirmation_number</span>
+      <h3>No Tickets Found</h3>
+      <p>Once you book free events or complete M-Pesa payments for paid events, your scannable entry tickets will appear here.</p>
+      <a class="btn btn-primary" href="{% url 'events:list' %}">Explore Campus Events</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

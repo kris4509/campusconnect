@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Booking Management — CampusConnect{% endblock %}
+
+{% block content %}
+<div class="container section">
+  <div class="dash-header">
+    <div>
+      <span class="eyebrow">Administration</span>
+      <h1>All Bookings</h1>
+      <p class="meta">Platform-wide overview of all student event bookings and passes.</p>
+    </div>
+    <a class="btn btn-secondary btn-sm" href="{% url 'dashboard:admin' %}">Back to Admin</a>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Reference</th>
+          <th>Student</th>
+          <th>Event</th>
+          <th>Status</th>
+          <th>Ticket Ref</th>
+          <th>Date Booked</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for booking in bookings %}
+          <tr>
+            <td><code>{{ booking.reference }}</code></td>
+            <td>
+              <strong>{{ booking.student.full_name }}</strong>
+              <div class="meta">{{ booking.student.email }}</div>
+            </td>
+            <td>
+              <a href="{% url 'events:detail' booking.event.pk %}" style="color:var(--primary);font-weight:600">
+                {{ booking.event.title }}
+              </a>
+            </td>
+            <td>
+              <span class="badge badge-{{ booking.status }}">{{ booking.get_status_display }}</span>
+            </td>
+            <td>
+              {% if booking.ticket %}
+                <code style="color:var(--accent)">{{ booking.ticket.reference }}</code>
+              {% else %}
+                <span class="meta">—</span>
+              {% endif %}
+            </td>
+            <td class="meta">{{ booking.created_at|date:"d M Y, H:i" }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="text-center" style="padding:36px">No bookings are recorded on the platform yet.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

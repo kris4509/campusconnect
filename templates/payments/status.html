@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Payment Status — CampusConnect{% endblock %}
+
+{% block content %}
+<div class="container section">
+  <div class="payment-layout">
+    <div class="status-card" id="status-card">
+      {% if payment.status == "pending" %}
+        <div class="spinner" id="spinner"></div>
+        <div class="status-icon pending" id="status-icon" style="display:none">
+          <span class="material-symbols-outlined">schedule</span>
+        </div>
+        <h2 id="status-heading">Processing Payment...</h2>
+        <p id="status-desc">
+          An STK Push has been sent to <strong>{{ payment.phone_number }}</strong>.
+          Please check your phone, enter your M-Pesa PIN, and confirm.
+        </p>
+        <div class="meta" style="margin-bottom:24px">
+          Payment Reference: <code>{{ payment.booking.reference }}</code>
+        </div>
+        <div id="countdown" class="meta" style="color:var(--text-3);font-size:12px;margin-bottom:20px">
+          Checking status automatically...
+        </div>
+        <div style="display:flex;justify-content:center;gap:12px">
+          <a class="btn btn-secondary" href="{% url 'bookings:list' %}">Check Bookings</a>
+          <a class="btn btn-ghost" href="{% url 'payments:pay' payment.booking.id %}">Try Again</a>
+        </div>
+
+      {% elif payment.status == "successful" %}
+        <div class="status-icon success">
+          <span class="material-symbols-outlined">check_circle</span>
+        </div>
+        <h2 style="color:var(--success)">Payment Received!</h2>
+        <p>Your payment of <strong>KES {{ payment.amount|floatformat:2 }}</strong> was confirmed successfully.</p>
+        {% if payment.mpesa_receipt %}
+          <div class="meta" style="margin-bottom:20px">
+            M-Pesa Receipt: <strong>{{ payment.mpesa_receipt }}</strong>
+          </div>
+        {% endif %}
+        <a class="btn btn-primary btn-lg" href="{% url 'bookings:tickets' %}">
+          <span class="material-symbols-outlined">confirmation_number</span> View Your Digital Ticket
+        </a>
+
+      {% else %}
+        <div class="status-icon failed">
+          <span class="material-symbols-outlined">cancel</span>
+        </div>
+        <h2 style="color:var(--danger)">Payment Unsuccessful</h2>
+        <p>{{ payment.result_description|default:"The payment request was cancelled or timed out." }}</p>
+        <div style="display:flex;justify-content:center;gap:12px;margin-top:20px">
+          <a class="btn btn-primary" href="{% url 'payments:pay' payment.booking.id %}">
+            <span class="material-symbols-outlined">replay</span> Retry Payment
+          </a>
+          <a class="btn btn-secondary" href="{% url 'bookings:list' %}">My Bookings</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if payment.status == "pending" %}
+<script>
+  let checkCount = 0;
+  const maxChecks = 45; // Poll for up to ~90 seconds
+
+  const pollInterval = setInterval(() => {
+    checkCount++;
+    if (checkCount > maxChecks) {
+      clearInterval(pollInterval);
+      document.getElementById('countdown').textContent = "Waiting timed out. If you paid, your ticket will appear in your bookings once confirmed.";
+      return;
+    }
+
+    fetch("{% url 'payments:status_check' payment.id %}")
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'successful') {
+          clearInterval(pollInterval);
+          document.getElementById('spinner').style.display = 'none';
+          document.getElementById('status-heading').textContent = "Payment Confirmed!";
+          document.getElementById('status-heading').style.color = "var(--success)";
+          document.getElementById('status-desc').textContent = "Receipt: " + (data.receipt || "Confirmed") + ". Redirecting to your digital ticket...";
+          setTimeout(() => {
+            window.location.href = data.redirect || "{% url 'bookings:tickets' %}";
+          }, 1500);
+        } else if (data.status === 'failed' || data.status === 'cancelled') {
+          clearInterval(pollInterval);
+          document.getElementById('spinner').style.display = 'none';
+          document.getElementById('status-heading').textContent = "Payment " + data.display;
+          document.getElementById('status-heading').style.color = "var(--danger)";
+          document.getElementById('status-desc').textContent = data.description || "The transaction could not be completed.";
+        }
+      })
+      .catch(err => console.error("Poll check error:", err));
+  }, 2500);
+</script>
+{% endif %}
+{% endblock %}

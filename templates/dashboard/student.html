@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Student Dashboard — CampusConnect{% endblock %}
+
+{% block content %}
+<div class="container section">
+  <div class="dash-header">
+    <div>
+      <span class="eyebrow">Student Portal</span>
+      <h1>Welcome back, {{ user.full_name }}</h1>
+      <p class="meta">Manage your event passes, bookings, and campus schedule.</p>
+    </div>
+    <a class="btn btn-primary btn-sm" href="{% url 'events:list' %}">
+      <span class="material-symbols-outlined">explore</span> Explore Events
+    </a>
+  </div>
+
+  <!-- Quick Metrics -->
+  <div class="stat-grid">
+    <div class="stat-card accent">
+      <span class="stat-label">Active Bookings</span>
+      <span class="stat-value">{{ bookings|length }}</span>
+    </div>
+    <div class="stat-card teal">
+      <span class="stat-label">Role Account</span>
+      <span class="stat-value" style="font-size:22px;text-transform:capitalize">{{ user.role }}</span>
+    </div>
+    <div class="stat-card purple">
+      <span class="stat-label">Digital Passes</span>
+      <span class="stat-value">
+        <a href="{% url 'bookings:tickets' %}" style="color:var(--purple);font-size:18px;display:inline-flex;align-items:center;gap:4px">
+          View Tickets <span class="material-symbols-outlined" style="font-size:18px">arrow_forward</span>
+        </a>
+      </span>
+    </div>
+    <div class="stat-card success">
+      <span class="stat-label">M-Pesa History</span>
+      <span class="stat-value">
+        <a href="{% url 'payments:history' %}" style="color:var(--success);font-size:18px;display:inline-flex;align-items:center;gap:4px">
+          Payments <span class="material-symbols-outlined" style="font-size:18px">receipt_long</span>
+        </a>
+      </span>
+    </div>
+  </div>
+
+  <!-- Quick Action Navigation -->
+  <div class="quick-actions">
+    <a class="action-card" href="{% url 'bookings:tickets' %}">
+      <div class="action-icon orange">
+        <span class="material-symbols-outlined">qr_code</span>
+      </div>
+      <div>
+        <h3>My Tickets</h3>
+        <p>Access your arrival QR codes</p>
+      </div>
+    </a>
+    <a class="action-card" href="{% url 'bookings:list' %}">
+      <div class="action-icon purple">
+        <span class="material-symbols-outlined">bookmark_border</span>
+      </div>
+      <div>
+        <h3>All Bookings</h3>
+        <p>Check pending & confirmed</p>
+      </div>
+    </a>
+    <a class="action-card" href="{% url 'payments:history' %}">
+      <div class="action-icon green">
+        <span class="material-symbols-outlined">paid</span>
+      </div>
+      <div>
+        <h3>Payment History</h3>
+        <p>Receipts & M-Pesa records</p>
+      </div>
+    </a>
+    <a class="action-card" href="{% url 'accounts:profile' %}">
+      <div class="action-icon teal">
+        <span class="material-symbols-outlined">badge</span>
+      </div>
+      <div>
+        <h3>Student Profile</h3>
+        <p>Update phone & ID info</p>
+      </div>
+    </a>
+  </div>
+
+  <!-- Recent Bookings Table -->
+  <div class="section-header">
+    <div>
+      <span class="section-eyebrow">Recent Activity</span>
+      <h2>Recent Bookings</h2>
+    </div>
+    <a class="btn btn-secondary btn-sm" href="{% url 'bookings:list' %}">View All Bookings</a>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Event Title</th>
+          <th>Reference</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for booking in bookings %}
+          <tr>
+            <td>
+              <a href="{% url 'events:detail' booking.event.pk %}" style="font-weight:700;color:var(--primary)">
+                {{ booking.event.title }}
+              </a>
+            </td>
+            <td><code>{{ booking.reference }}</code></td>
+            <td class="meta">{{ booking.event.event_date|date:"D, d M Y" }}</td>
+            <td>
+              <span class="badge badge-{{ booking.status }}">
+                {{ booking.get_status_display }}
+              </span>
+            </td>
+            <td>
+              {% if booking.status == "confirmed" and booking.ticket %}
+                <a class="btn btn-primary btn-sm" href="{% url 'bookings:ticket_detail' booking.ticket.pk %}" style="padding:4px 8px;font-size:12px">
+                  View Pass
+                </a>
+              {% elif booking.status == "pending" and booking.event.is_paid %}
+                <a class="btn btn-primary btn-sm" href="{% url 'payments:pay' booking.pk %}" style="padding:4px 8px;font-size:12px;background:#059669;border-color:#059669">
+                  Pay KES {{ booking.event.ticket_price|floatformat:0 }}
+                </a>
+              {% else %}
+                <a class="btn btn-secondary btn-sm" href="{% url 'bookings:list' %}" style="padding:4px 8px;font-size:12px">
+                  Details
+                </a>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5" class="text-center" style="padding:36px">
+              You haven't booked any events yet.
+              <div style="margin-top:10px">
+                <a class="btn btn-primary btn-sm" href="{% url 'events:list' %}">Browse upcoming events</a>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

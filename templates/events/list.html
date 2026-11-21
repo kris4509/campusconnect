@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Explore Events — CampusConnect{% endblock %}
+
+{% block content %}
+<div class="container section">
+  <div class="section-header">
+    <div>
+      <span class="section-eyebrow">Discover</span>
+      <h1>Explore Campus Events</h1>
+    </div>
+  </div>
+
+  <!-- Search & Filter Bar -->
+  <form method="get" class="filter-bar">
+    <div class="filter-group" style="flex:2;min-width:200px">
+      <label for="q">Search Keyword</label>
+      <input id="q" class="filter-input" name="q" value="{{ query|default:'' }}" placeholder="Event title, speaker, or topic...">
+    </div>
+    <div class="filter-group">
+      <label for="category">Category</label>
+      <select id="category" class="filter-input" name="category">
+        <option value="">All Categories</option>
+        {% for item in categories %}
+          <option value="{{ item.pk }}" {% if category == item.pk|stringformat:"s" %}selected{% endif %}>{{ item.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-group">
+      <label for="date">Event Date</label>
+      <input id="date" class="filter-input" name="date" type="date" value="{{ date|default:'' }}">
+    </div>
+    <div class="filter-group">
+      <label for="price">Pricing</label>
+      <select id="price" class="filter-input" name="price">
+        <option value="">All Prices</option>
+        <option value="free" {% if price == "free" %}selected{% endif %}>Free Only</option>
+        <option value="paid" {% if price == "paid" %}selected{% endif %}>Paid Only</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary" type="submit" style="height:44px">
+        <span class="material-symbols-outlined">filter_list</span> Filter
+      </button>
+      {% if query or category or date or price %}
+        <a class="btn btn-secondary" href="{% url 'events:list' %}" style="height:44px;display:inline-flex;align-items:center" title="Clear filters">
+          <span class="material-symbols-outlined">restart_alt</span>
+        </a>
+      {% endif %}
+    </div>
+  </form>
+
+  <!-- Events Grid -->
+  {% if events %}
+    <div class="event-grid">
+      {% for event in events %}
+        <a class="event-card" href="{% url 'events:detail' event.pk %}">
+          <div class="card-image">
+            <img src="{{ event.poster_url }}" alt="{{ event.title }}" loading="lazy">
+            <span class="card-badge">{{ event.category.name }}</span>
+            <div class="card-date-badge">
+              <strong>{{ event.event_date|date:"d" }}</strong>
+              <span>{{ event.event_date|date:"M" }}</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <h3 class="card-title">{{ event.title }}</h3>
+            <div class="card-meta">
+              <div class="card-meta-item">
+                <span class="material-symbols-outlined">calendar_month</span>
+                <span>{{ event.event_date|date:"l, d M Y" }}</span>
+              </div>
+              <div class="card-meta-item">
+                <span class="material-symbols-outlined">schedule</span>
+                <span>{{ event.start_time|time:"H:i" }} - {{ event.end_time|time:"H:i" }}</span>
+              </div>
+              <div class="card-meta-item">
+                <span class="material-symbols-outlined">location_on</span>
+                <span>{{ event.venue|truncatechars:30 }}</span>
+              </div>
+            </div>
+            <div class="card-footer">
+              <span class="card-price {% if not event.is_paid %}free{% endif %}">
+                {% if event.is_paid %}KES {{ event.ticket_price|floatformat:0 }}{% else %}FREE{% endif %}
+              </span>
+              <span class="card-availability">
+                {% if event.tickets_remaining > 0 %}
+                  {{ event.tickets_remaining }} left
+                {% else %}
+                  <span style="color:var(--danger)">Sold Out</span>
+                {% endif %}
+              </span>
+            </div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <span class="material-symbols-outlined">search_off</span>
+      <h3>No Events Match Your Search</h3>
+      <p>We couldn't find any events matching your selected criteria. Try adjusting the keywords or filters.</p>
+      <a class="btn btn-secondary" href="{% url 'events:list' %}">Reset All Filters</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ event.title }} — CampusConnect{% endblock %}
+
+{% block content %}
+<div class="container section">
+  <!-- Event Poster Banner -->
+  <img class="detail-banner" src="{{ event.poster_url }}" alt="{{ event.title }}">
+
+  <div class="detail-layout">
+    <!-- Main Content Area -->
+    <div class="detail-main">
+      <span class="badge badge-purple" style="margin-bottom:12px">{{ event.category.name }}</span>
+      <h1>{{ event.title }}</h1>
+
+      <div class="detail-meta">
+        <div class="detail-meta-item">
+          <span class="material-symbols-outlined">calendar_today</span>
+          <span>{{ event.event_date|date:"l, d F Y" }}</span>
+        </div>
+        <div class="detail-meta-item">
+          <span class="material-symbols-outlined">schedule</span>
+          <span>{{ event.start_time|time:"H:i" }} – {{ event.end_time|time:"H:i" }}</span>
+        </div>
+        <div class="detail-meta-item">
+          <span class="material-symbols-outlined">location_on</span>
+          <span>{{ event.venue }}</span>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <h3 style="margin-bottom:12px;font-size:20px;color:var(--primary)">About this Event</h3>
+      <div class="detail-description">
+        {{ event.description|linebreaks }}
+      </div>
+
+      <!-- Organizer Bio -->
+      <div class="organizer-row">
+        <div class="organizer-avatar">
+          {{ event.organizer.full_name|slice:":1"|default:"O" }}
+        </div>
+        <div>
+          <span style="font-size:12px;color:var(--text-3);text-transform:uppercase;font-weight:700">Organized by</span>
+          <h4 style="margin:2px 0 0;font-size:16px">{{ event.organizer.full_name }}</h4>
+        </div>
+      </div>
+
+      {% if event.external_registration_url %}
+        <div style="margin-top:24px;padding:16px 20px;background:var(--bg-warm);border-radius:var(--radius-lg);border:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="material-symbols-outlined" style="color:var(--teal)">link</span>
+            <div>
+              <strong>External Registration / Information Link</strong>
+              <div class="meta"><a href="{{ event.external_registration_url }}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">Visit external event site</a></div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Sticky Booking / Pricing Panel -->
+    <aside>
+      <div class="booking-panel">
+        <span class="eyebrow" style="display:block;margin-bottom:4px">Ticket Price</span>
+        <div class="price-display {% if not event.is_paid %}free{% endif %}">
+          {% if event.is_paid %}
+            KES {{ event.ticket_price|floatformat:0 }}
+          {% else %}
+            FREE
+          {% endif %}
+        </div>
+        <span class="price-label">Per attendee admission pass</span>
+
+        <div class="panel-info">
+          <div class="panel-info-row">
+            <span>Date</span>
+            <span>{{ event.event_date|date:"d M Y" }}</span>
+          </div>
+          <div class="panel-info-row">
+            <span>Time</span>
+            <span>{{ event.start_time|time:"H:i" }}</span>
+          </div>
+          <div class="panel-info-row">
+            <span>Venue</span>
+            <span>{{ event.venue|truncatechars:20 }}</span>
+          </div>
+          <div class="panel-info-row">
+            <span>Deadline</span>
+            <span style="font-size:12px">{{ event.registration_deadline|date:"d M Y, H:i" }}</span>
+          </div>
+
+          <!-- Capacity & Availability indicator -->
+          <div style="margin-top:10px">
+            <div class="panel-info-row" style="font-size:13px">
+              <span>Availability</span>
+              <span><strong>{{ event.tickets_remaining }}</strong> of {{ event.maximum_tickets }} left</span>
+            </div>
+            <div class="availability-bar">
+              <div class="availability-fill {% if event.availability_percent < 20 %}critical{% elif event.availability_percent < 50 %}low{% endif %}"
+                   style="width: {{ event.availability_percent }}%;"></div>
+            </div>
+          </div>
+        </div>
+
+        {% if event.is_paid %}
+          <div class="mpesa-brand" style="margin-bottom:16px;padding:8px 12px;font-size:12px">
+            <span class="material-symbols-outlined" style="font-size:20px">smartphone</span>
+            <span>Pay with <strong>M-Pesa STK Push</strong></span>
+          </div>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+          {% if event.tickets_remaining > 0 %}
+            <form method="post" action="{% url 'bookings:create' event.pk %}">
+              {% csrf_token %}
+              <button class="btn btn-primary btn-block btn-lg" type="submit">
+                <span class="material-symbols-outlined">confirmation_number</span>
+                {% if event.is_paid %}Book & Pay with M-Pesa{% else %}Claim Free Ticket{% endif %}
+              </button>
+            </form>
+          {% else %}
+            <button class="btn btn-secondary btn-block btn-lg" disabled style="opacity:.6;cursor:not-allowed">
+              Sold Out
+            </button>
+          {% endif %}
+        {% else %}
+          <a class="btn btn-primary btn-block btn-lg" href="{% url 'accounts:login' %}?next={{ request.path }}">
+            Sign In to Book Ticket
+          </a>
+        {% endif %}
+
+        <p class="meta text-center" style="margin-top:14px;font-size:12px">
+          <span class="material-symbols-outlined" style="font-size:14px;vertical-align:-2px">verified_user</span>
+          Instant QR Code verification generated upon confirmation.
+        </p>
+      </div>
+    </aside>
+  </div>
+</div>
+{% endblock %}
